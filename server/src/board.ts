@@ -1,16 +1,22 @@
 
 export class BoardState {
-    grid: Array<string | null>;
+    grid: Array<Array<string | null>>;
 
     constructor() {
         this.grid = new Array();
     }
 
-    setGridValue(idx: number, val: string): void {
-        this.grid[idx] = val;
+    makeGrid(data: Array<Array<string | null>>) {
+        this.grid = data;
     }
 
-    getGrid(): Array<string | null> {
+    setGridValue(col: number, row: number, val: string): void {
+        // only allow if the box can contain other value than null
+        if (this.grid[col][row] !== null)
+            this.grid[col][row] = val;
+    }
+
+    getGrid(): Array<Array<string | null>> {
         return this.grid;
     }
 

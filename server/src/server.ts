@@ -2,19 +2,15 @@ import express from "express";
 import cors from "cors";
 import * as socket from "socket.io";
 import * as http from "http";
-import { User, Board } from "./types/data";
+import { User } from "./types/data";
 import { UserState } from "./user";
+import { BoardState } from "./board";
 
 const PORT: number = 8000
 
 const app: express.Application = express();
 
 app.use(cors());
-
-app.get("/", (req, res) => {
-    res.send("Hello World!");
-})
-
 const server: http.Server = http.createServer(app);
 
 const io: socket.Server = new socket.Server(server, {
@@ -25,24 +21,36 @@ const io: socket.Server = new socket.Server(server, {
 
 const userState = new UserState();
 
-const board: Board = {
-    grid: [],
-    setGrid: function(arr: Array<string | null>) {
-        this.grid = arr;
-    }
-}
+const boardState = new BoardState();
+
+boardState.makeGrid([
+    ['', '', '', '', null, '', '', '', '', ''],
+    ['', '', '', '', null, '', '', '', '', ''],
+    ['', '', '', '', '', '', '', '', '', ''],
+    ['', '', '', '', '', null, '', '', '', ''],
+    [null, null, '', '', '', null, null, '', '', ''],
+    ['', '', '', null, null, '', '', '', null, null],
+    ['', '', '', '', null, '', '', '', '', ''],
+    ['', '', '', '', '', '', '', '', '', ''],
+    ['', '', '', '', '', null, '', '', '', ''],
+    ['', '', '', '', '', null, '', '', '', ''],
+])
 
 io.on("connection", (socket) => {
     userState.addUser({ Id: socket.id, IsOnTimeout: false } as User);
 
-    io.emit('userList', userState.getAllUsers());
+    io.emit("usersCount", userState.getAllUsersCount());
 
-    socket.on("userList", (callback) => {
-        callback(userState.getAllUsers());
+    socket.emit("gameState", boardState.getGrid());
+
+    socket.on("changeBlock", (row, col, val) => {
+        boardState.setGridValue(row, col, val);
+        socket.broadcast.emit("gameState", boardState.getGrid());
     })
 
     socket.on("disconnect", () => {
         userState.removeUser(socket.id);
+        io.emit("usersCount", userState.getAllUsersCount());
     })
 })
 

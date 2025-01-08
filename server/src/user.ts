@@ -16,6 +16,10 @@ export class UserState {
         return this.usersList;
     }
 
+    getAllUsersCount(): number {
+        return this.usersList.length;
+    }
+
     removeUser(id: string): void {
         this.usersList = this.usersList.filter(user => {
             user.Id !== id;
@@ -40,7 +44,7 @@ export class UserState {
         if (!user) return false;
 
         const currDate = new Date();
-        const timeDiff: number = user.Timeout.getSeconds() - currDate.getSeconds();
+        const timeDiff: number = user.Timeout!.getSeconds() - currDate.getSeconds();
         return timeDiff >= this.TIMEOUTDUR;
     }
 };
