@@ -20,13 +20,23 @@ export class UserState {
         return this.usersList.length;
     }
 
+    userExists(id: string): boolean {
+        return this.usersList.some(user => user.Id === id);
+    }
+
     removeUser(id: string): void {
-        this.usersList = this.usersList.filter(user => {
-            user.Id !== id;
-        });
+        const user = this.getUserById(id);
+        if (!user) return;
+
+        const idx = this.usersList.indexOf(user);
+
+        this.usersList.splice(idx, 1)
     }
 
     addUser(user: User): void {
+        // check if user exists 
+        if (this.userExists(user.Id)) return
+
         this.usersList.push(user);
     }
 

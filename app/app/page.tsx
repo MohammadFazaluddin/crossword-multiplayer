@@ -1,7 +1,7 @@
 "use client"
 
 import { socket } from "@/lib/socket";
-import { ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
 
@@ -9,40 +9,31 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [gameBoard, setBoard] = useState<Array<Array<string | null>>>([])
 
+
   useEffect(() => {
-    if (socket.connected) {
-      onConnect();
-    }
 
-    function onConnect() {
-      socket.on("gameState", game => {
-        setBoard(game);
-      })
-    }
+    const handleGameState = (game: string[][]) => setBoard(game);
+    const handleUsersCount = (count: number) => setUsersCount(count);
+    const handleMessage = (message: string) => setMessage(message);
 
-    function onDisconnect() {
-    }
-
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-
-    socket.on('usersCount', (usersCount) => {
-      setUsersCount(usersCount);
-    })
-
-    socket.on('message', (data) => {
-      setMessage(data);
-    });
+    socket.on('gameState', handleGameState);
+    socket.on('usersCount', handleUsersCount);
+    socket.on('message', handleMessage);
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
+      socket.off('message', handleMessage);
+      socket.off('usersCount', handleUsersCount);
+      socket.off('gameState', handleGameState);
     }
 
   }, [])
 
-  function captureChar(e: ChangeEvent<HTMLInputElement>) {
-    console.log(e);
+  function updateCell(value: string, row: number, col: number) {
+    socket.emit("updateBlock", {
+      "row": row,
+      "col": col,
+      "val": value
+    })
   }
 
   return (
@@ -53,7 +44,7 @@ export default function Home() {
         <div className="ml-2 font-bold">{usersCount}</div>
       </div>
       <div className="flex flex-col w-fit mx-auto border-8 border-green-500">
-        {gameBoard &&
+        {
           gameBoard.map((row: Array<string | null>, idx: number) => (
             <div key={idx} className="flex flex-row w-full">
               {
@@ -63,7 +54,7 @@ export default function Home() {
                     className={`border-4 border-green-500 w-12 h-12 text-center focus:bg-blue-100
                       ${col == null ? 'bg-green-500 text-white' : ''}`}
                     defaultValue={col ?? ''}
-                    onChange={captureChar}
+                    onChange={e => updateCell(e.target.value, idx, idx2)}
                     disabled={col == null}
                     maxLength={1}
                   />

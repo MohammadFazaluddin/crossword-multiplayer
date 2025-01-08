@@ -15,7 +15,7 @@ const server: http.Server = http.createServer(app);
 
 const io: socket.Server = new socket.Server(server, {
     cors: {
-        origin: "*"
+        origin: ['http://localhost:3000']
     }
 });
 
@@ -36,20 +36,25 @@ boardState.makeGrid([
     ['', '', '', '', '', null, '', '', '', ''],
 ])
 
-io.on("connection", (socket) => {
+io.on("connection", socket => {
+
     userState.addUser({ Id: socket.id, IsOnTimeout: false } as User);
 
     io.emit("usersCount", userState.getAllUsersCount());
 
     socket.emit("gameState", boardState.getGrid());
 
-    socket.on("changeBlock", (row, col, val) => {
-        boardState.setGridValue(row, col, val);
-        socket.broadcast.emit("gameState", boardState.getGrid());
+    socket.on("updateBlock", ({ col, row, val }) => {
+        boardState.setGridValue(col, row, val);
+        const board = boardState.getGrid();
+        socket.broadcast.emit("gameState", board);
     })
 
     socket.on("disconnect", () => {
+        console.log(userState.getAllUsers());
+        console.log(socket.id);
         userState.removeUser(socket.id);
+        console.log(userState.getAllUsers());
         io.emit("usersCount", userState.getAllUsersCount());
     })
 })

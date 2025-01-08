@@ -12,8 +12,8 @@ export class BoardState {
 
     setGridValue(col: number, row: number, val: string): void {
         // only allow if the box can contain other value than null
-        if (this.grid[col][row] !== null)
-            this.grid[col][row] = val;
+        if (this.grid[row][col] !== null)
+            this.grid[row][col] = val;
     }
 
     getGrid(): Array<Array<string | null>> {
