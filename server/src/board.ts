@@ -1,5 +1,5 @@
 
-export class BoardState {
+export class Board {
     grid: Array<Array<string | null>>;
 
     constructor() {
@@ -10,9 +10,9 @@ export class BoardState {
         this.grid = data;
     }
 
-    setGridValue(col: number, row: number, val: string): void {
+    setGridCellValue(col: number, row: number, val: string): void {
         // only allow if the box can contain other value than null
-        if (this.grid[row][col] !== null)
+        if (this.grid[row][col] != null)
             this.grid[row][col] = val;
     }
 

@@ -1,6 +1,11 @@
-export type User = {
+export interface User {
     Id: string;
-    IsOnTimeout: boolean;
-    Timeout: Date;
+    TimeoutDate: Date;
+}
+
+export interface UpdateBlockParams {
+    row: number;
+    col: number;
+    val: string;
 }
 

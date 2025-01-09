@@ -1,13 +1,15 @@
 "use client"
 
-import { socket } from "@/lib/socket";
+import useSocket from "@/src/hooks/socket";
 import { useEffect, useState } from "react";
 
 export default function Home() {
 
+  const SERVER_URL = process.env.SERVER_URL || 'http://localhost:8000';
   const [usersCount, setUsersCount] = useState<number>(0);
   const [message, setMessage] = useState("");
   const [gameBoard, setBoard] = useState<Array<Array<string | null>>>([])
+  const socket = useSocket(SERVER_URL);
 
 
   useEffect(() => {
@@ -16,24 +18,28 @@ export default function Home() {
     const handleUsersCount = (count: number) => setUsersCount(count);
     const handleMessage = (message: string) => setMessage(message);
 
-    socket.on('gameState', handleGameState);
-    socket.on('usersCount', handleUsersCount);
-    socket.on('message', handleMessage);
+    if (socket) {
+      socket.on('gameState', handleGameState);
+      socket.on('usersCount', handleUsersCount);
+      socket.on('message', handleMessage);
 
-    return () => {
-      socket.off('message', handleMessage);
-      socket.off('usersCount', handleUsersCount);
-      socket.off('gameState', handleGameState);
+      return () => {
+        socket.off('message', handleMessage);
+        socket.off('usersCount', handleUsersCount);
+        socket.off('gameState', handleGameState);
+      }
+
     }
-
-  }, [])
+  }, [socket])
 
   function updateCell(value: string, row: number, col: number) {
-    socket.emit("updateBlock", {
-      "row": row,
-      "col": col,
-      "val": value
-    })
+    if (socket) {
+      socket.emit('updateCell', {
+        "col": col,
+        "row": row,
+        "val": value
+      })
+    }
   }
 
   return (
@@ -53,7 +59,7 @@ export default function Home() {
                     key={idx2}
                     className={`border-4 border-green-500 w-12 h-12 text-center focus:bg-blue-100
                       ${col == null ? 'bg-green-500 text-white' : ''}`}
-                    defaultValue={col ?? ''}
+                    value={col ?? ''}
                     onChange={e => updateCell(e.target.value, idx, idx2)}
                     disabled={col == null}
                     maxLength={1}
