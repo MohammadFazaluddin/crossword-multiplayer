@@ -1,18 +1,21 @@
 import { User } from "./types/data";
 
 export class BoardRules {
-    readonly TIMEOUT = 10000 * 60; // timeout of 1 minute in miliseconds
+    private readonly TIMEOUT_MS = 60 * 1000; // 1 minute in milliseconds
 
     validateUserMove(user: User): boolean {
+        const currentTime = new Date().getTime();
+        const timeoutTime = new Date(user.TimeoutDate).getTime();
 
-        const timeDiff: number = user.TimeoutDate.getTime() - new Date().getTime();
+        return currentTime >= timeoutTime;
+    }
 
-        if (timeDiff > this.TIMEOUT) {
-            return true;
-        }
+    getNewUserTimeoutStart(): Date {
+        return new Date(Date.now() - this.TIMEOUT_MS);
+    }
 
-        return false;
+    getUserTimeoutEnd(): Date {
+        return new Date(Date.now() + this.TIMEOUT_MS);
     }
 }
-
 

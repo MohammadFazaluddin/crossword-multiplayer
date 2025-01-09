@@ -2,9 +2,10 @@ import express from "express";
 import cors from "cors";
 import * as socket from "socket.io";
 import * as http from "http";
-import { UpdateBlockParams, User } from "./types/data";
-import { UserState } from "./user";
+import { UpdateBlockParams } from "./types/data";
+import { UserState } from "./userState";
 import { BoardState } from "./boardState";
+import { BoardRules } from "./boardRules";
 
 const PORT: number = 8000
 const CLIENT_URL = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
@@ -24,10 +25,14 @@ const userState = new UserState();
 
 const boardState = new BoardState();
 
+const rules = new BoardRules();
+
 // using middleware to centralize the logic
 io.use((socket, next) => {
+
     try {
-        userState.addUser({ Id: socket.id, IsOnTimeout: false } as User);
+
+        userState.addUser(socket.id);
         next();
     } catch (err) {
         console.error(`Middleware error: ${err}`);
@@ -43,7 +48,7 @@ io.on("connection", socket => {
         // board
         socket.emit("gameState", boardState.getGrid());
 
-        socket.on("updateCell", (params) => handleUpdateCell(params, socket.id));
+        socket.on("updateCell", (params) => handleUpdateCell(params, socket.id, socket));
 
         // disconnect
         socket.on("disconnect", () => {
@@ -57,16 +62,24 @@ io.on("connection", socket => {
 })
 
 function handleUpdateCell({ col, row, val }: UpdateBlockParams, id: string, socket: socket.Socket) {
+
     const user = userState.getUserById(id);
+
+    if (!user) return;
+
     if (boardState.setCellValue(col, row, val, user)) {
+
         const board = boardState.getGrid();
+        userState.setUserTimeout(user!.Id, rules.getUserTimeoutEnd());
         io.emit("gameState", board);
+
     } else {
+
         socket.emit("userTimeOut", user?.TimeoutDate);
+
     }
 }
 
 server.listen(PORT, () => {
     console.log(`Server listening to port: ${PORT}`);
 });
-

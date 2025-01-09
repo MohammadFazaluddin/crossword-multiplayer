@@ -3,13 +3,10 @@ import { BoardRules } from "./boardRules";
 import { User } from "./types/data";
 
 export class BoardState {
-
-    board: Board = new Board();
-    boardRules: BoardRules = new BoardRules();
-    readonly TIMEOUT = 1000; // timeout in miliseconds
+    private board: Board = new Board();
+    private boardRules: BoardRules = new BoardRules();
 
     constructor() {
-        // make 10x10 grid
         this.board.makeGrid([
             ['', '', '', '', null, '', '', '', '', ''],
             ['', '', '', '', null, '', '', '', '', ''],
@@ -21,24 +18,21 @@ export class BoardState {
             ['', '', '', '', '', '', '', '', '', ''],
             ['', '', '', '', '', null, '', '', '', ''],
             ['', '', '', '', '', null, '', '', '', ''],
-        ]);
+        ])
     }
 
-    setCellValue(col: number, row: number, val: string, user: User | undefined): boolean {
 
-        if (!user) return false
+    setCellValue(col: number, row: number, val: string, user: User): boolean {
+        if (!user) return false;
 
         if (!this.boardRules.validateUserMove(user)) return false;
 
-        user.TimeoutDate = new Date();
         this.board.setGridCellValue(col, row, val);
         return true;
-
     }
 
     getGrid(): Array<Array<string | null>> {
         return this.board.getGrid();
     }
-
 }
 
