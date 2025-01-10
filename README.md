@@ -1,5 +1,16 @@
 # MULTIPLAYER CROSSWORD
 
+## Clone the repository
+
+Clone this repository to your directory and cd into the repositor
+
+```bash
+
+git clone https://github.com/MohammadFazaluddin/crossword-multiplayer.git
+cd crossword-multiplayer/
+
+```
+
 ## Get Started
 
 This project is mainly divided into 2 parts
@@ -9,7 +20,7 @@ This project is mainly divided into 2 parts
 
 To start the application first open the server directory, 
 Install the dependencies
-Execute the run command for ExpressJs
+Run the server (server will run on port: 8000)
 
 - Server
 ```bash
@@ -22,7 +33,7 @@ npm run dev
 
 Once you have the server running, start the client application 
 Navigate yourself to the client/app directory install the dependencies.
-Once everything is setup run your application
+Once everything is setup run your application (client will run on port: 3000)
 
 - Client
 ```bash
