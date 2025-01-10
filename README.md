@@ -2,7 +2,7 @@
 
 ## Clone the repository
 
-Clone this repository to your directory and cd into the repositor
+Clone this repository to your directory and cd into the repository
 
 ```bash
 
