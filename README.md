@@ -32,13 +32,13 @@ npm run dev
 ```
 
 Once you have the server running, start the client application 
-Navigate yourself to the client/app directory install the dependencies.
+Navigate yourself to the client/app directory and again install the dependencies.
 Once everything is setup run your application (client will run on port: 3000)
 
 - Client
 ```bash
 
-cd .. && cd app/
+cd ../app/
 npm install
 npm run dev
 
